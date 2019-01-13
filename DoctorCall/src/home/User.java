@@ -3,7 +3,7 @@ package home;
 
 
 public class User {
-    private int userid;
+    private int userId;
     private String username;
     private String password;
     private int roleId;
@@ -11,19 +11,19 @@ public class User {
     public User() {
     }
 
-    public User(int userid, String username, String password, int roleId) {
-        this.userid = userid;
+    public User(int userId, String username, String password, int roleId) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.roleId = roleId;
     }
 
-    public int getUserid() {
-        return userid;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUserid(int userid) {
-        this.userid = userid;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -50,9 +50,12 @@ public class User {
         this.roleId = roleId;
     }
 
+    
+
+
     @Override
     public String toString() {
-        return "User Details \n" + "User ID:\t" + userid + "\n Username:\t" + username + "\n password:\t" + password + "\n roleId:\t" + roleId;
+        return "User Details \n" + "User ID:\t" + userId + "\n Username:\t" + username + "\n password:\t" + password + "\n roleId:\t" + roleId;
     }
   
     
