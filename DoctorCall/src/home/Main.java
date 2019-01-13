@@ -12,6 +12,7 @@ public class Main {
         Database.printAllUsers();
 //        Database.createUser();
 //        Database.deleteUser();
+//Database.editUser();
 
     }
 

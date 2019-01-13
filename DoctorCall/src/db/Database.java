@@ -30,11 +30,11 @@ public class Database {
                 String role = rs1.getString(4);
                 count++;
                 if (count == 1) {
-                    System.out.println("User ID " + " | " + " Username " + "\t | " + " Password " + "\t | " + " Role ");
+                    System.out.println("User ID" + " | " + " Username " + "\t | " + " Password \t" + " | " + " Role ");
                     System.out.println("---------------------------------------------------------------");
                 } else {
                 }
-                System.out.println(id + "\t | " + username + "\t | " + password + "\t | " + role);
+                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
             }
             ps1.close();
             conn.close();;
@@ -43,12 +43,45 @@ public class Database {
         }
     }
 
+    public static void showUserById(int userId) {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(urldb, user, pass);
+            String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id=role.rid and user.uid=?  AND deleted=0 order by uid;";
+            PreparedStatement ps1 = conn.prepareStatement(sqlSelect);
+            ps1.setInt(1, userId);
+            ResultSet rs1 = ps1.executeQuery();
+            int count = 0;
+            while (rs1.next()) {
+                Long id = rs1.getLong(1);
+                String username = rs1.getString(2);
+                String password = rs1.getString(3);
+                String role = rs1.getString(4);
+                System.out.println("You have chosen user: ");
+                System.out.println("\tUsername: "+username);
+                System.out.println("\tPassword: "+password);
+                System.out.println("\tRole: "+ role);
+//                count++;
+//                if (count == 1) {
+//                    System.out.println("User ID" + " | " + " Username " + "\t | " + " Password \t" + " | " + " Role ");
+//                    System.out.println("---------------------------------------------------------------");
+//                } else {
+//                }
+//                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
+            }
+            ps1.close();
+            conn.close();
+        } catch (SQLException ex) {
+            System.out.println("Problem connecting to the database: " + ex);
+        }
+    }
+
     public static void createUser() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter username: ");
-        String newUsername = sc.next().toLowerCase();
+        String newUsername = sc.next().toLowerCase().trim();
         System.out.println("Please enter password: ");
-        String newPassword = sc.next().toLowerCase();
+        String newPassword = sc.next().toLowerCase().trim();
         System.out.println("Available roles to choose ");
         System.out.println("\t[1] Administrator\n\t[2] User(Patient/Doctor)\n\t[3] State Authority");
         System.out.println("----------------------------------------------------");
@@ -63,18 +96,64 @@ public class Database {
             ps1.setString(1, newUsername);
             ps1.setString(2, newPassword);
             ps1.setInt(3, roleId);
-            
+
             int cnt = ps1.executeUpdate();
-            System.out.println("User "+ newUsername+" successfully created");
+            System.out.println("User " + newUsername + " successfully created");
 
             sc.close();
             ps1.close();
-            conn.close();;
+            conn.close();
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
 
-        }
+        }}
+        
+    
+    
+public static void editUser() {
+        Scanner sc = new Scanner(System.in);
 
+        System.out.println("This is the list of users.");
+        Database.printAllUsers();
+        System.out.println("\n");
+        System.out.println("Which user do you want to edit?");
+        System.out.println("Enter user id here: ");
+        int userId = sc.nextInt();
+        Database.showUserById(userId);
+                
+        System.out.println("Please enter a new username: ");
+        String newUsername = sc.next().toLowerCase().trim();
+        System.out.println("Please enter a new password: ");
+        String newPassword = sc.next().toLowerCase().trim();
+        System.out.println("Available roles to choose ");
+        System.out.println("\t[1] Administrator\n\t[2] User(Patient/Doctor)\n\t[3] State Authority");
+        System.out.println("----------------------------------------------------");
+        System.out.println("Please enter role id: ");
+        int roleId = sc.nextInt();
+        
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(urldb, user, pass);
+            String sqlEditUser = "UPDATE user SET username=?, password=?, role_id=? where user.uid=?;";
+            PreparedStatement ps1 = conn.prepareStatement(sqlEditUser);
+            ps1.setString(1, newUsername);
+            ps1.setString(2, newPassword);
+            ps1.setInt(3, roleId);
+            ps1.setInt(4, userId);
+
+            int cnt = ps1.executeUpdate();
+            if (cnt==1){
+            System.out.println("User " + newUsername + " successfully updated");
+//            System.out.println("These are the new details");
+//            Database.showUserById(userId);
+            } else{};
+            sc.close();
+            ps1.close();
+            conn.close();
+        } catch (SQLException ex) {
+            System.out.println("Problem connecting to the database: " + ex);
+        }
+    }
 //    private Connection conn = null;
 //    private Statement stmt = null;
 //    private PreparedStatement preparedStatement = null;
@@ -140,46 +219,71 @@ public class Database {
 //        } catch (Exception e) {
 //        }
 //    }
-    }
 
     public static void deleteUser() {
 //        String answer=null;
-        
+
         Scanner sc = new Scanner(System.in);
         System.out.println("This is the list of users.");
         Database.printAllUsers();
         System.out.println();
-        System.out.println("To choose a user for deletion enter the user ID here: ");       
+        System.out.println("To choose a user for deletion enter the user ID here: ");
         int userid = sc.nextInt();
-        System.out.println("You have selected the user with id= "+ userid);
+        System.out.println("You have selected the user with id= " + userid);
         System.out.println("Are you sure you want to delete the user? Press y/n");
-        String answer= sc.next();
-        
-        if ("y".equals(answer)){
+        String answer = sc.next();
+
+        if ("y".equals(answer)) {
             Connection conn = null;
+            try {
+                conn = DriverManager.getConnection(urldb, user, pass);
+                String sqlCreateUser = "UPDATE  user SET deleted=1 WHERE uid=?";
+                PreparedStatement ps1 = conn.prepareStatement(sqlCreateUser);
+                ps1.setInt(1, userid);
+
+                int cnt = ps1.executeUpdate();
+                System.out.println("User with user ID: " + userid + " successfully deleted");
+
+                sc.close();
+                ps1.close();
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println("Problem connecting to the database: " + ex);
+            }
+        } else {
+            System.out.println(" Exiting the programm...");
+        };
+
+    }
+
+    public static void superPrintAllMessages() {
+        Connection conn = null;
         try {
             conn = DriverManager.getConnection(urldb, user, pass);
-            String sqlCreateUser = "UPDATE  user SET deleted=1 WHERE uid=?";
-            PreparedStatement ps1 = conn.prepareStatement(sqlCreateUser);
-            ps1.setInt(1, userid);
-            
-            int cnt = ps1.executeUpdate();
-            System.out.println("User with user ID: "+userid+ " successfully deleted");
-
-            sc.close();
+            String sqlSelectAllMsgs = "SELECT  ";
+            PreparedStatement ps1 = conn.prepareStatement(sqlSelectAllMsgs);
+            ResultSet rs1 = ps1.executeQuery();
+            int count = 0;
+            while (rs1.next()) {
+                Long id = rs1.getLong(1);
+                String username = rs1.getString(2);
+                String password = rs1.getString(3);
+                String role = rs1.getString(4);
+                count++;
+                if (count == 1) {
+                    System.out.println("User ID " + " | " + " Username " + "\t | " + " Password " + "\t | "+" Role ");
+                    System.out.println("---------------------------------------------------------------");
+                } else {
+                }
+                System.out.println(id + "\t | " + username + "\t | " + password + "\t | " + role);
+            }
             ps1.close();
-            conn.close();
+            conn.close();;
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
-        }else { System.out.println(" Exiting the programm...");};
-            
-        
     }
 
-        
-    
-    
     public static void printAllInbox() {
 
     }
