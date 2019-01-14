@@ -12,11 +12,13 @@ public class AdminMenu {
         System.out.println("[1]. View all users");
         System.out.println("[2]. Create new user");
         System.out.println("[3]. Edit existing user");
-        System.out.println("[4]. View all available user roles");
+        
         System.out.println("---Messages---");
-        System.out.println("[5]. View Messages");
-        System.out.println("[6]. Edit messages");
-        System.out.println("[7]. Delete messages");
+        System.out.println("[4]. View messages from all users");
+        System.out.println("[5]. Edit a user message");
+        System.out.println("[6]. Delete a user message");
+        
+        System.out.println("---");
         
 
     } while () {

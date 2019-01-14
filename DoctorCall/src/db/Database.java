@@ -51,7 +51,7 @@ public class Database {
             PreparedStatement ps1 = conn.prepareStatement(sqlSelect);
             ps1.setInt(1, userId);
             ResultSet rs1 = ps1.executeQuery();
-            int count = 0;
+//            int count = 0;
             while (rs1.next()) {
                 Long id = rs1.getLong(1);
                 String username = rs1.getString(2);
@@ -154,6 +154,16 @@ public static void editUser() {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
+
+
+
+public static void authenticateUser(){
+    Connection conn = null;
+
+}
+
+
+
 //    private Connection conn = null;
 //    private Statement stmt = null;
 //    private PreparedStatement preparedStatement = null;

@@ -1,6 +1,7 @@
 package home;
 
 import db.Database;
+import menu.UserMenu;
 
 public class Main {
 
@@ -9,10 +10,12 @@ public class Main {
 //        User user = new User(1,"admin", "password", 1);
 //        System.out.println(user);
 //        Database db = new Database();
-        Database.printAllUsers();
+//        Database.printAllUsers();
 //        Database.createUser();
 //        Database.deleteUser();
 //Database.editUser();
+        UserMenu umenu= new UserMenu();
+        umenu.usermenu();
 
     }
 
