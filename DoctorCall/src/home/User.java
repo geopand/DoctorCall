@@ -1,28 +1,29 @@
-
 package home;
 
 
 public class User {
-    private int userId;
+    private long userId;
     private String username;
     private String password;
-    private int roleId;
+    private long roleId;
 
     public User() {
     }
 
-    public User(int userId, String username, String password, int roleId) {
+    public User(long userId, String username, String password, long roleId) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.roleId = roleId;
     }
 
-    public int getUserId() {
+    
+    
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
@@ -42,27 +43,51 @@ public class User {
         this.password = password;
     }
 
-    public int getRoleId() {
+    public long getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(int roleId) {
+    public void setRoleId(long roleId) {
         this.roleId = roleId;
     }
 
-    
-
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
 
     @Override
-    public String toString() {
-        return "User Details \n" + "User ID:\t" + userId + "\n Username:\t" + username + "\n password:\t" + password + "\n roleId:\t" + roleId;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final User other = (User) obj;
+        if (this.userId != other.userId) {
+            return false;
+        }
+        return true;
     }
-  
-    
-    
- 
+
     
 
+    
+    
+    
+    
+    @Override
+    public String toString() {
+        return "User{" + "userId=" + userId + ", username=" + username + ", password=" + password + ", roleId=" + roleId + '}';
+    }
+    
+
+    
     
     
 }

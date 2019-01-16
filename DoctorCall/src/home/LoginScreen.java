@@ -19,7 +19,7 @@ public class LoginScreen {
         System.out.println("Welcome to Doctor Call");
         System.out.println("---------------------------");
         System.out.println("Please provide your credentials");
-        System.out.println("Enter usernanme:  ");
+        System.out.println("Enter username:  ");
         String loginUsername = sc.next().toLowerCase().trim();
         System.out.println("Enter password:  ");
         String loginPassword = sc.next().toLowerCase().trim();

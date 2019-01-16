@@ -1,19 +1,20 @@
-package db;
+package DBActions;
 
+import home.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
+import util.DoctorCallException;
 
 public class Database {
 
     static String user = "admin";
     static String pass = "admin";
-    static String link = "jdbc:mysql://localhost:3306/doctorcall?serverTimezone=UTC&characterEncoding=utf-8&autoReconnect=true";
-//     static String options = "?zeroDateTimeBehavior=convertToNull&serverTimezone=Europe/Athens&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false";
-    static String urldb = link;
+    static String urldb = "jdbc:mysql://localhost:3306/doctorcall?serverTimezone=UTC&characterEncoding=utf-8&autoReconnect=true";
+//  static String options = "?zeroDateTimeBehavior=convertToNull&serverTimezone=Europe/Athens&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false";
 
     public static void printAllUsers() {
         Connection conn = null;
@@ -58,9 +59,9 @@ public class Database {
                 String password = rs1.getString(3);
                 String role = rs1.getString(4);
                 System.out.println("You have chosen user: ");
-                System.out.println("\tUsername: "+username);
-                System.out.println("\tPassword: "+password);
-                System.out.println("\tRole: "+ role);
+                System.out.println("\tUsername: " + username);
+                System.out.println("\tPassword: " + password);
+                System.out.println("\tRole: " + role);
 //                count++;
 //                if (count == 1) {
 //                    System.out.println("User ID" + " | " + " Username " + "\t | " + " Password \t" + " | " + " Role ");
@@ -76,10 +77,15 @@ public class Database {
         }
     }
 
-    public static void createUser() {
+    public static void createUserInDB() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter username: ");
         String newUsername = sc.next().toLowerCase().trim();
+        User user =fetchUserbyUsernameOrNull(newUsername);
+        System.out.println("user.getUsername()");
+        
+                
+        
         System.out.println("Please enter password: ");
         String newPassword = sc.next().toLowerCase().trim();
         System.out.println("Available roles to choose ");
@@ -88,29 +94,51 @@ public class Database {
         System.out.println("Please enter role id: ");
         int roleId = sc.nextInt();
 
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(urldb, user, pass);
-            String sqlCreateUser = "INSERT INTO user (username, password, role_id) VALUES (?,?,?);";
-            PreparedStatement ps1 = conn.prepareStatement(sqlCreateUser);
+        String sqlCreateUser = "INSERT INTO user (username, password, role_id) VALUES (?,?,?);";
+
+        try (Connection conn = openConnection();
+                PreparedStatement ps1 = conn.prepareStatement(sqlCreateUser);) {
+
             ps1.setString(1, newUsername);
             ps1.setString(2, newPassword);
-            ps1.setInt(3, roleId);
+            ps1.setLong(3, roleId);
 
             int cnt = ps1.executeUpdate();
             System.out.println("User " + newUsername + " successfully created");
 
-            sc.close();
-            ps1.close();
-            conn.close();
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
 
-        }}
+        }
+        }
+
+    public static User fetchUserbyUsernameOrNull(String username) throws DoctorCallException, SQLException {
+        String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE username='?';";
         
-    
-    
-public static void editUser() {
+        try (Connection conn = openConnection();
+                PreparedStatement ps1 = conn.prepareStatement(sqlFetchUser);)
+                { ps1.setString(1, username);
+            ResultSet rs = ps1.executeQuery();
+            if (rs.next()) {
+                User user = new User(rs.getLong("uid"), rs.getString("username"), rs.getString("password"), rs.getLong("role_id"));
+        return user;
+//                return createUserOb(rs);
+            } else {
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new DoctorCallException(e.getMessage(), e);
+        }
+
+    }
+
+//    private static User createUserOb(ResultSet rs) throws SQLException, DoctorCallException {
+//        User user = new User(rs.getLong("uid"), rs.getString("username"), rs.getString("password"), rs.getLong("role_id"));
+//        return user;
+//    }
+
+    public static void editUser() {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("This is the list of users.");
@@ -120,7 +148,7 @@ public static void editUser() {
         System.out.println("Enter user id here: ");
         int userId = sc.nextInt();
         Database.showUserById(userId);
-                
+
         System.out.println("Please enter a new username: ");
         String newUsername = sc.next().toLowerCase().trim();
         System.out.println("Please enter a new password: ");
@@ -130,7 +158,7 @@ public static void editUser() {
         System.out.println("----------------------------------------------------");
         System.out.println("Please enter role id: ");
         int roleId = sc.nextInt();
-        
+
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(urldb, user, pass);
@@ -142,11 +170,12 @@ public static void editUser() {
             ps1.setInt(4, userId);
 
             int cnt = ps1.executeUpdate();
-            if (cnt==1){
-            System.out.println("User " + newUsername + " successfully updated");
+            if (cnt == 1) {
+                System.out.println("User " + newUsername + " successfully updated");
 //            System.out.println("These are the new details");
 //            Database.showUserById(userId);
-            } else{};
+            } else {
+            };
             sc.close();
             ps1.close();
             conn.close();
@@ -155,14 +184,14 @@ public static void editUser() {
         }
     }
 
+    public static void authenticateUser() {
+        Connection conn = null;
 
+    }
 
-public static void authenticateUser(){
-    Connection conn = null;
-
-}
-
-
+    private static Connection openConnection() throws SQLException {
+        return DriverManager.getConnection(urldb, user, pass);
+    }
 
 //    private Connection conn = null;
 //    private Statement stmt = null;
@@ -229,7 +258,6 @@ public static void authenticateUser(){
 //        } catch (Exception e) {
 //        }
 //    }
-
     public static void deleteUser() {
 //        String answer=null;
 
@@ -281,7 +309,7 @@ public static void authenticateUser(){
                 String role = rs1.getString(4);
                 count++;
                 if (count == 1) {
-                    System.out.println("User ID " + " | " + " Username " + "\t | " + " Password " + "\t | "+" Role ");
+                    System.out.println("User ID " + " | " + " Username " + "\t | " + " Password " + "\t | " + " Role ");
                     System.out.println("---------------------------------------------------------------");
                 } else {
                 }
