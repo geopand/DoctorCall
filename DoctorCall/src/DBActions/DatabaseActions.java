@@ -9,26 +9,53 @@ import java.sql.SQLException;
 import java.util.Scanner;
 import util.DoctorCallException;
 
-public class Database {
+public class DatabaseActions {
 
     static String user = "admin";
     static String pass = "admin";
     static String urldb = "jdbc:mysql://localhost:3306/doctorcall?serverTimezone=UTC&characterEncoding=utf-8&autoReconnect=true";
 //  static String options = "?zeroDateTimeBehavior=convertToNull&serverTimezone=Europe/Athens&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false";
 
+    public static User fetchUserOrNull(String username, String password) throws DoctorCallException, SQLException {
+        String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE username=? and password=?;";
+
+        try ( Connection conn = openConnection();
+              PreparedStatement ps = conn.prepareStatement(sqlFetchUser);) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+
+                User user = new User();
+                user.setUserId(rs.getLong(1));
+                user.setUsername(rs.getString(2));
+                user.setPassword(rs.getString(3));
+                user.setRoleId(rs.getLong(4));
+                return user;
+//                return createUserOb(rs);
+            } else {
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new DoctorCallException(e.getMessage(), e);
+        }
+
+    }
+
     public static void printAllUsers() {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(urldb, user, pass);
-            String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
-            PreparedStatement ps1 = conn.prepareStatement(sqlSelect);
-            ResultSet rs1 = ps1.executeQuery();
+
+        String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
+
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
+            ResultSet rs = ps.executeQuery();
             int count = 0;
-            while (rs1.next()) {
-                Long id = rs1.getLong(1);
-                String username = rs1.getString(2);
-                String password = rs1.getString(3);
-                String role = rs1.getString(4);
+            while (rs.next()) {
+                Long id = rs.getLong(1);
+                String username = rs.getString(2);
+                String password = rs.getString(3);
+                String role = rs.getString(4);
                 count++;
                 if (count == 1) {
                     System.out.println("User ID" + " | " + " Username " + "\t | " + " Password \t" + " | " + " Role ");
@@ -37,21 +64,18 @@ public class Database {
                 }
                 System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
             }
-            ps1.close();
-            conn.close();;
+
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
 
     public static void showUserById(int userId) {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(urldb, user, pass);
-            String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id=role.rid and user.uid=?  AND deleted=0 order by uid;";
-            PreparedStatement ps1 = conn.prepareStatement(sqlSelect);
-            ps1.setInt(1, userId);
-            ResultSet rs1 = ps1.executeQuery();
+        String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id=role.rid and user.uid=?  AND deleted=0 order by uid;";
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
+            ps.setInt(1, userId);
+            ResultSet rs1 = ps.executeQuery();
 //            int count = 0;
             while (rs1.next()) {
                 Long id = rs1.getLong(1);
@@ -70,22 +94,21 @@ public class Database {
 //                }
 //                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
             }
-            ps1.close();
-            conn.close();
+
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
 
+    /*
     public static void createUserInDB() throws DoctorCallException, SQLException {
+        
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter username: ");
         String newUsername = sc.next().toLowerCase().trim();
-        User user =fetchUserbyUsernameOrNull(newUsername);
+        User user = fetchUserbyUsernameOrNull(newUsername);
         System.out.println("user.getUsername()");
-        
-                
-        
+
         System.out.println("Please enter password: ");
         String newPassword = sc.next().toLowerCase().trim();
         System.out.println("Available roles to choose ");
@@ -110,44 +133,24 @@ public class Database {
             System.out.println("Problem connecting to the database: " + ex);
 
         }
-        }
-
-    public static User fetchUserbyUsernameOrNull(String username) throws DoctorCallException, SQLException {
-        String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE username='?';";
-        
-        try (Connection conn = openConnection();
-                PreparedStatement ps1 = conn.prepareStatement(sqlFetchUser);)
-                { ps1.setString(1, username);
-            ResultSet rs = ps1.executeQuery();
-            if (rs.next()) {
-                User user = new User(rs.getLong("uid"), rs.getString("username"), rs.getString("password"), rs.getLong("role_id"));
-        return user;
-//                return createUserOb(rs);
-            } else {
-                return null;
-            }
-
-        } catch (SQLException e) {
-            throw new DoctorCallException(e.getMessage(), e);
-        }
-
     }
-
+     */
 //    private static User createUserOb(ResultSet rs) throws SQLException, DoctorCallException {
 //        User user = new User(rs.getLong("uid"), rs.getString("username"), rs.getString("password"), rs.getLong("role_id"));
 //        return user;
 //    }
-
+    
+   /* 
     public static void editUser() {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("This is the list of users.");
-        Database.printAllUsers();
+        DatabaseActions.printAllUsers();
         System.out.println("\n");
         System.out.println("Which user do you want to edit?");
         System.out.println("Enter user id here: ");
         int userId = sc.nextInt();
-        Database.showUserById(userId);
+        DatabaseActions.showUserById(userId);
 
         System.out.println("Please enter a new username: ");
         String newUsername = sc.next().toLowerCase().trim();
@@ -173,7 +176,7 @@ public class Database {
             if (cnt == 1) {
                 System.out.println("User " + newUsername + " successfully updated");
 //            System.out.println("These are the new details");
-//            Database.showUserById(userId);
+//            DatabaseActions.showUserById(userId);
             } else {
             };
             sc.close();
@@ -184,6 +187,10 @@ public class Database {
         }
     }
 
+    */
+    
+    
+    
     public static void authenticateUser() {
         Connection conn = null;
 
@@ -211,59 +218,13 @@ public class Database {
 //            this.close();
 //        }
 //    }
-//    public ArrayList readDataBase(String query, int columns) throws Exception {
-//        try {
-//            // Setup the connection with the DB
-//            conn = DriverManager.getConnection("jdbc:mysql://localhost/afdemp_java_1?useSSL=false", "dbuser", "1234");
-//            // Statements allow to issue SQL queries to the database
-//            stmt = conn.createStatement();
-//            // Result set get the result of the SQL query
-//            rs = stmt.executeQuery(query);
-//
-//            //    resultSet.last();
-//            //    System.out.println(resultSet.getRow());
-//            ArrayList al = new ArrayList();
-//            while (rs.next()) {
-//                if (columns == 1) {
-//                    al.add(rs.getString(1));
-//                } else {
-//                    ArrayList al2 = new ArrayList();
-//                    for (int i = 1; i <= columns; i++) {
-//                        al2.add(rs.getString(i));
-//                    }
-//                    al.add(al2);
-//                }
-//
-//            }
-//            return al;
-//
-//        } catch (Exception e) {
-//            throw e;
-//        } finally {
-//            this.close();
-//        }
-//    }
-//
-//    private void close() {
-//        try {
-//            if (rs != null) {
-//                rs.close();
-//            }
-//            if (stmt != null) {
-//                stmt.close();
-//            }
-//            if (conn != null) {
-//                conn.close();
-//            }
-//        } catch (Exception e) {
-//        }
-//    }
+//   
     public static void deleteUser() {
 //        String answer=null;
 
         Scanner sc = new Scanner(System.in);
         System.out.println("This is the list of users.");
-        Database.printAllUsers();
+        DatabaseActions.printAllUsers();
         System.out.println();
         System.out.println("To choose a user for deletion enter the user ID here: ");
         int userid = sc.nextInt();

@@ -1,10 +1,9 @@
-
 package DBActions;
 
 import dao.MessageDAO;
 
 
-public class MessageImplDAO implements MessageDAO{
+public class MessageDBActions implements MessageDAO{
     
     
     

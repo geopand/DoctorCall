@@ -57,7 +57,11 @@ public class Message {
         this.creationDate = creationDate;
     }
 
-  
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -76,6 +80,10 @@ public class Message {
         }
         return true;
     }
+
+  
+
+    
     
     
 
