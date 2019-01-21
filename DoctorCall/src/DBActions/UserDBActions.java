@@ -53,10 +53,7 @@ public class UserDBActions {
         }
     }
 
-//    private static User createUserOb(ResultSet rs) throws SQLException, DoctorCallException {
-//        User user = new User(rs.getLong("uid"), rs.getString("username"), rs.getString("password"), rs.getLong("role_id"));
-//        return user;
-//    }
+
     
 public static void editUser() {
         Scanner sc = new Scanner(System.in);
