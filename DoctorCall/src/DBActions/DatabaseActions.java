@@ -16,16 +16,16 @@ public class DatabaseActions {
     static String urldb = "jdbc:mysql://localhost:3306/doctorcall?serverTimezone=UTC&characterEncoding=utf-8&autoReconnect=true";
 //  static String options = "?zeroDateTimeBehavior=convertToNull&serverTimezone=Europe/Athens&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false";
 
+//grabs username and password and returns a user (if exists in DB else returns null)
     public static User fetchUserOrNull(String username, String password) throws DoctorCallException, SQLException {
         String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE username=? and password=?;";
 
-        try ( Connection conn = openConnection();
-              PreparedStatement ps = conn.prepareStatement(sqlFetchUser);) {
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlFetchUser);) {
             ps.setString(1, username);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-
                 User user = new User();
                 user.setUserId(rs.getLong(1));
                 user.setUsername(rs.getString(2));
@@ -44,7 +44,6 @@ public class DatabaseActions {
     }
 
     public static void printAllUsers() {
-
         String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
 
         try (Connection conn = openConnection();
@@ -139,8 +138,7 @@ public class DatabaseActions {
 //        User user = new User(rs.getLong("uid"), rs.getString("username"), rs.getString("password"), rs.getLong("role_id"));
 //        return user;
 //    }
-    
-   /* 
+    /* 
     public static void editUser() {
         Scanner sc = new Scanner(System.in);
 
@@ -187,10 +185,7 @@ public class DatabaseActions {
         }
     }
 
-    */
-    
-    
-    
+     */
     public static void authenticateUser() {
         Connection conn = null;
 
