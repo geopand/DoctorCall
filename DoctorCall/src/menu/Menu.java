@@ -1,6 +1,7 @@
 package menu;
 
 import DBActions.DatabaseActions;
+import DBActions.UserDBActions;
 import home.LoginScreen;
 import home.User;
 import java.sql.SQLException;
@@ -11,12 +12,11 @@ public class Menu {
 
     User user;
 
-    //Constructor
+//Constructor
     public Menu(User user) {
         this.user = user;
     }
 
-    //method
     public void showMenu() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
         Boolean isNumber = true;
@@ -54,31 +54,34 @@ public class Menu {
                             DatabaseActions.printAllUsers();
                             break;
                         case 2:
-                            System.out.println("all sent messages");
+                            UserDBActions.createUserInDB();
+                            System.out.println();
+                            showMenu();
                             break;
-                        case 3:
-                            System.out.println("delete an inbox messages");
+                        case 3: 
+                            UserDBActions.editUser();
+                            showMenu();
                             break;
                         case 4:
-                            System.out.println("delete an sent messages");
+                            System.out.println("View all inbox messages");
                             break;
                         case 5:
-                            System.out.println("all inbox messages");
+                            System.out.println("View all sent messages");
                             break;
                         case 6:
-                            System.out.println("all sent messages");
+                            System.out.println("Delete an inbox message");
                             break;
                         case 7:
-                            System.out.println("delete an inbox messages");
+                            System.out.println("Delete a  sent message");
                             break;
                         case 8:
-                            System.out.println("delete an sent messages");
+                            System.out.println("View messages from all users");
                             break;
                         case 9:
-                            System.out.println("all sent messages");
+                            System.out.println(" Edit a user's message");
                             break;
                         case 10:
-                            System.out.println("delete an inbox messages");
+                            System.out.println("Delete a user message");
                             break;
                         case 11:
                             System.out.println();
