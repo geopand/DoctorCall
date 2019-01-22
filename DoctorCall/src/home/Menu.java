@@ -1,9 +1,9 @@
-package menu;
+package home;
 
 import DBActions.DatabaseActions;
 import DBActions.UserDBActions;
 import home.LoginScreen;
-import home.User;
+import entities.User;
 import java.sql.SQLException;
 import java.util.Scanner;
 import util.DoctorCallException;
@@ -28,18 +28,19 @@ public class Menu {
             System.out.println("[1] View all users");
             System.out.println("[2] Create new user");
             System.out.println("[3] Edit existing user");
+            System.out.println("[4] Delete a user");
             System.out.println("______________________________");
             System.out.println("---Admin's Messages---");
-            System.out.println("[4] View all inbox messages");
-            System.out.println("[5] View all sent messages");
-            System.out.println("[6] Delete an inbox message");
-            System.out.println("[7] Delete a  sent message");
+            System.out.println("[5] View all inbox messages");
+            System.out.println("[6] View all sent messages");
+            System.out.println("[7] Delete an inbox message");
+            System.out.println("[8] Delete a  sent message");
             System.out.println("______________________________");
             System.out.println("---User's Messages---");
-            System.out.println("[8]  View messages from all users");
-            System.out.println("[9]  Edit a user message");
-            System.out.println("[10] Delete a user message");
-            System.out.println("[11] Log out");
+            System.out.println("[9]  View messages from all users");
+            System.out.println("[10]  Edit a user message");
+            System.out.println("[11] Delete a user message");
+            System.out.println("[12] Log out");
 //        System.out.print("\nEnter your choice >> ");
 
             while (true) {
@@ -63,7 +64,8 @@ public class Menu {
                             showMenu();
                             break;
                         case 4:
-                            System.out.println("View all inbox messages");
+                            UserDBActions.deleteUser();
+                            showMenu();
                             break;
                         case 5:
                             System.out.println("View all sent messages");
@@ -84,6 +86,10 @@ public class Menu {
                             System.out.println("Delete a user message");
                             break;
                         case 11:
+                            System.out.println();
+                            LoginScreen.login();
+                            break;
+                            case 12:
                             System.out.println();
                             LoginScreen.login();
                             break;

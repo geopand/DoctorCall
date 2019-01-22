@@ -1,4 +1,4 @@
-package home;
+package entities;
 
 
 public class User {

@@ -1,11 +1,12 @@
 package DBActions;
 
-import home.User;
+import entities.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import util.DoctorCallException;
 
@@ -43,6 +44,24 @@ public class DatabaseActions {
 
     }
 
+    public static boolean usernameExists(String username) throws DoctorCallException, SQLException {
+        String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE username=?;";
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlFetchUser);) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return true;
+//                return createUserOb(rs);
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            throw new DoctorCallException(e.getMessage(), e);
+        }
+    }
+    
+    
     public static void printAllUsers() {
         String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
 
@@ -61,7 +80,7 @@ public class DatabaseActions {
                     System.out.println("---------------------------------------------------------------");
                 } else {
                 }
-                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
+                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);                
             }
 
         } catch (SQLException ex) {
@@ -69,6 +88,23 @@ public class DatabaseActions {
         }
     }
 
+    public static ArrayList<Long> getArrayListUserIds() {
+            ArrayList<Long> al = new ArrayList<Long>();    
+        String sqlSelect = "SELECT uid FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";       
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
+            ResultSet rs = ps.executeQuery();
+            int count = 0;
+            while (rs.next()) {
+                Long id = rs.getLong(1);
+               al.add(rs.getLong(1));}
+        }
+        catch (SQLException ex) {
+            System.out.println("Problem connecting to the database: " + ex);
+        }return al;
+    }
+    
+     
     public static void showUserById(int userId) {
         String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id=role.rid and user.uid=?  AND deleted=0 order by uid;";
         try (Connection conn = openConnection();
@@ -99,54 +135,11 @@ public class DatabaseActions {
         }
     }
 
-    
-
-
- 
-    public static void authenticateUser() {
-        Connection conn = null;
-
-    }
-
     public static Connection openConnection() throws SQLException {
         return DriverManager.getConnection(urldb, user, pass);
     }
 
-    public static void deleteUser() {
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("This is the list of users.");
-        DatabaseActions.printAllUsers();
-        System.out.println();
-        System.out.println("To choose a user for deletion enter the user ID here: ");
-        int userid = sc.nextInt();
-        System.out.println("You have selected the user with id= " + userid);
-        System.out.println("Are you sure you want to delete the user? Press y/n");
-        String answer = sc.next();
-
-        if ("y".equals(answer)) {
-            Connection conn = null;
-            try {
-                conn = DriverManager.getConnection(urldb, user, pass);
-                String sqlCreateUser = "UPDATE  user SET deleted=1 WHERE uid=?";
-                PreparedStatement ps1 = conn.prepareStatement(sqlCreateUser);
-                ps1.setInt(1, userid);
-
-                int cnt = ps1.executeUpdate();
-                System.out.println("User with user ID: " + userid + " successfully deleted");
-
-                sc.close();
-                ps1.close();
-                conn.close();
-            } catch (SQLException ex) {
-                System.out.println("Problem connecting to the database: " + ex);
-            }
-        } else {
-            System.out.println(" Exiting the programm...");
-        };
-
-    }
-
+    
     public static void superPrintAllMessages() {
         Connection conn = null;
         try {

@@ -5,11 +5,36 @@
  */
 package DBActions;
 
+import static DBActions.DatabaseActions.openConnection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 /**
  *
  * @author Georg
  */
 public class Garbage {
+    
+public static ArrayList<Long> getArrayListUserIds() {
+            ArrayList<Long> al = new ArrayList<Long>();    
+        String sqlSelect = "SELECT uidFROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";       
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
+            ResultSet rs = ps.executeQuery();
+            int count = 0;
+            while (rs.next()) {
+                Long id = rs.getLong(1);
+               al.add(rs.getLong(1));}
+        }
+        catch (SQLException ex) {
+            System.out.println("Problem connecting to the database: " + ex);
+        }return al;
+    }
+    
+    
     
  /*   
     public static void editUser() {

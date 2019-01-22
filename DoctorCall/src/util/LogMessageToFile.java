@@ -1,6 +1,6 @@
 package util;
 
-import home.Message;
+import entities.Message;
 import java.io.FileWriter;
 import java.io.IOException;
 

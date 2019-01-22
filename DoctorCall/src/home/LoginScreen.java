@@ -1,10 +1,10 @@
 package home;
 
+import entities.User;
 import DBActions.DatabaseActions;
 import DBActions.UserDBActions;
 import java.sql.SQLException;
 import java.util.Scanner;
-import menu.Menu;
 import util.DoctorCallException;
 
 public class LoginScreen {
