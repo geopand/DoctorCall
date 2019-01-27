@@ -111,10 +111,7 @@ public class UserDBActions {
 
         System.out.println("Please enter a new username: ");
         String newUsername = sc.next().toLowerCase().trim();
-        while (DatabaseActions.usernameExists(newUsername) == true) {
-            System.out.println("This username is already taken!\n");
-            editUser();
-        }
+
 
         System.out.println("Please enter a new password: ");
         String newPassword = sc.next().toLowerCase().trim();

@@ -40,7 +40,6 @@ public class DatabaseActions {
         } catch (SQLException e) {
             throw new DoctorCallException(e.getMessage(), e);
         }
-
     }
 
     public static boolean usernameExists(String username) throws DoctorCallException, SQLException {
@@ -87,7 +86,6 @@ public class DatabaseActions {
                 }
                 System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
             }
-
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
@@ -188,14 +186,6 @@ public class DatabaseActions {
             System.out.println("Problem connecting to the database: " + ex);
         }
         return null;
-    }
-
-    public static void printAllInbox() {
-
-    }
-
-    public static void printAllSent() {
-
     }
 
 }
