@@ -66,7 +66,7 @@ public class DatabaseActions {
         return false;
     }
 
-    public static void printAllUsers() {
+    public static void printAllUsersPasswordsRoles() {
         String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
 
         try (Connection conn = openConnection();
@@ -85,6 +85,30 @@ public class DatabaseActions {
                 } else {
                 }
                 System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem connecting to the database: " + ex);
+        }
+    }
+    
+    public static void printAllUsers() {
+        String sqlSelect = "SELECT uid, username, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
+
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
+            ResultSet rs = ps.executeQuery();
+            int count = 0;
+            while (rs.next()) {
+                Long id = rs.getLong(1);
+                String username = rs.getString(2);
+                String role = rs.getString(3);
+                count++;
+                if (count == 1) {
+                    System.out.println("User ID" + " | " + " Username " + "\t | " +  " Role ");
+                    System.out.println("---------------------------------------------------------------");
+                } else {
+                }
+                System.out.println(id + "\t | " + username + "\t | "  + role);
             }
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);

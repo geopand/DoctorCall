@@ -20,7 +20,7 @@ public class Menu {
 
     public void showMenu() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nWelcome dear " + user.getUsername());
+        System.out.println("\nWelcome dear " + user.getUsername()+"!");
 
         if (user.getRoleId() == 1) {
             adminTextMenu();
@@ -31,7 +31,7 @@ public class Menu {
                 switch (choice) {
                     case 1:
                         System.out.println("These are the people using the application\n");
-                        DatabaseActions.printAllUsers();
+                        DatabaseActions.printAllUsersPasswordsRoles();
                         break;
                     case 2:
                         UserDBActions.createUserInDB();
@@ -73,26 +73,23 @@ public class Menu {
             } //while loop, exit
         }//if (choose role), exit
         else if (user.getRoleId() == 2) {
-            System.out.println("\n---USER MENU---");
-            System.out.println("What do you want to do?");
-            System.out.println("[1]. Send a message");
-            System.out.println("[1]. Inbox folder");
-            System.out.println("[3]. Sent folder");
-            System.out.println("[4]. Log out");
-            System.out.println("------------------------");
+            userTextMenu();
 
             while (true) {
                 System.out.print("\nEnter your choice >> ");
                 int choice = InputHelper.validateIntInput(sc);
                 switch (choice) {
                     case 1:
-
+                        MessageDBActions.sendMessage(user);
+                        showMenu();
                         break;
                     case 2: MessageDBActions.readUserInbox(user);
-                    showMenu();
+                    MessageDBActions.inboxMessageActionMenuUser(user);
+//                    userTextMenu();
                         break;
                     case 3:
-
+                        MessageDBActions.readUserSentFolder(user);
+                        MessageDBActions.sentMessageActionMenuUser(user);
                         break;
                     case 4:
                         System.out.println();
@@ -168,5 +165,18 @@ public class Menu {
         System.out.println("[9]  View/Edit/Delete messages from all users");
         System.out.println("[10] Log out");
     }
+    
+    public static void userTextMenu() {
+          System.out.println("\n---USER MENU---");
+            System.out.println("What do you want to do?");
+            System.out.println("[1]. Send a message");
+            System.out.println("[2]. Inbox folder");
+            System.out.println("[3]. Sent folder");
+            System.out.println("[4]. Log out");
+            System.out.println("____________________________");
+    }
+    
+    
+    
 }  //class exit
 

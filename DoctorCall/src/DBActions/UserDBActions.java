@@ -62,7 +62,7 @@ public class UserDBActions {
         int count=0;
         Scanner sc = new Scanner(System.in);
         System.out.println("This is the list of users.");
-        DatabaseActions.printAllUsers();
+        DatabaseActions.printAllUsersPasswordsRoles();
         ArrayList<Long> al = DatabaseActions.getArrayListUserIds();
         System.out.println();
         System.out.println("To choose a user for deletion enter the user ID here: ");
@@ -102,7 +102,7 @@ public class UserDBActions {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("This is the list of users.");
-        DatabaseActions.printAllUsers();
+        DatabaseActions.printAllUsersPasswordsRoles();
         System.out.println("\n");
         System.out.println("Which user do you want to edit?");
         System.out.print("Enter user id here: ");

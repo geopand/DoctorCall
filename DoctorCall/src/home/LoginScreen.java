@@ -24,20 +24,20 @@ public class LoginScreen {
                     + " |_____/ \\___/ \\___|\\__\\___/|_|   \\_____\\__,_|_|_|\n"
                     + "                                                  \n"
                     + "                                                  ");
-            System.out.println("The best point of contact between your doctor and you");
-            System.out.println("---------------------------");
+            System.out.println("The best point of contact between your doctor and you !");
+            System.out.println("-------------------------------------------------------\n");
             count++;
         }
 
         System.out.println("Please provide your credentials or press [q] to quit the application");
-        System.out.print("\tEnter your username:  ");
+        System.out.print("\t  Enter your username:  ");
         String username = sc.next().toLowerCase().trim();
         if (username.equals("q".toLowerCase())) {
             System.out.println("\nThank you for using our apllication!");
 
             System.exit(0);
         }
-        System.out.print("\tEnter your password:  ");
+        System.out.print("\t  Enter your password:  ");
         String password = sc.next().toLowerCase().trim();
         if (password.equals("q".toLowerCase())) {
             System.out.println("\nThank you for using our apllication!");
