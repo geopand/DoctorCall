@@ -33,7 +33,6 @@ public class DatabaseActions {
                 user.setPassword(rs.getString(3));
                 user.setRoleId(rs.getLong(4));
                 return user;
-//                return createUserOb(rs);
             } else {
                 return null;
             }
@@ -52,7 +51,6 @@ public class DatabaseActions {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return true;
-//                return createUserOb(rs);
             } else {
                 return false;
             }
@@ -60,8 +58,15 @@ public class DatabaseActions {
             throw new DoctorCallException(e.getMessage(), e);
         }
     }
-    
-    
+
+    public static boolean roleIdExists(Long roleId) throws DoctorCallException, SQLException {
+        ArrayList al = getAllRoleIds();
+        if (al.contains(roleId)) {
+            return true;
+        }
+        return false;
+    }
+
     public static void printAllUsers() {
         String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
 
@@ -80,7 +85,7 @@ public class DatabaseActions {
                     System.out.println("---------------------------------------------------------------");
                 } else {
                 }
-                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);                
+                System.out.println(id + "\t | " + username + "\t | " + password + "  \t | " + role);
             }
 
         } catch (SQLException ex) {
@@ -89,22 +94,22 @@ public class DatabaseActions {
     }
 
     public static ArrayList<Long> getArrayListUserIds() {
-            ArrayList<Long> al = new ArrayList<Long>();    
-        String sqlSelect = "SELECT uid FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";       
+        ArrayList<Long> al = new ArrayList<Long>();
+        String sqlSelect = "SELECT uid FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
         try (Connection conn = openConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
             ResultSet rs = ps.executeQuery();
             int count = 0;
             while (rs.next()) {
                 Long id = rs.getLong(1);
-               al.add(rs.getLong(1));}
-        }
-        catch (SQLException ex) {
+                al.add(rs.getLong(1));
+            }
+        } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
-        }return al;
+        }
+        return al;
     }
-    
-     
+
     public static void showUserById(int userId) {
         String sqlSelect = "SELECT uid, username, password, role.role FROM user, role WHERE user.role_id=role.rid and user.uid=?  AND deleted=0 order by uid;";
         try (Connection conn = openConnection();
@@ -139,7 +144,6 @@ public class DatabaseActions {
         return DriverManager.getConnection(urldb, user, pass);
     }
 
-    
     public static void superPrintAllMessages() {
         Connection conn = null;
         try {
@@ -166,6 +170,24 @@ public class DatabaseActions {
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
+    }
+
+    public static ArrayList<Long> getAllRoleIds() {
+        ArrayList<Long> al = new ArrayList<Long>();
+        String sqlSelect = "SELECT rid FROM role";
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlSelect);) {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                al.add(rs.getLong(1));
+            }
+            return al;
+
+        } catch (SQLException ex) {
+            System.out.println("Problem connecting to the database: " + ex);
+        }
+        return null;
     }
 
     public static void printAllInbox() {

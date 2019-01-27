@@ -7,9 +7,9 @@ import entities.User;
 import java.sql.SQLException;
 import java.util.Scanner;
 import util.DoctorCallException;
+import util.Validation;
 
 public class Menu {
-
     User user;
 
 //Constructor
@@ -19,8 +19,6 @@ public class Menu {
 
     public void showMenu() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
-        Boolean isNumber = true;
-        int choice = 0;
         System.out.println("\nWelcome dear " + user.getUsername());
 
         if (user.getRoleId() == 1) {
@@ -45,68 +43,58 @@ public class Menu {
 
             while (true) {
                 System.out.print("\nEnter your choice >> ");
-                if (sc.hasNextInt()) {
-                    choice = sc.nextInt();
-//                    isNumber = true;
+                int choice = Validation.validateIntInput(sc);
+                switch (choice) {
+                    case 1:
+                        System.out.println("These are of the people using the application\n");
+                        DatabaseActions.printAllUsers();
+                        break;
+                    case 2:
+                        UserDBActions.createUserInDB();
+                        System.out.println();
+                        showMenu();
+                        break;
+                    case 3:
+                        UserDBActions.editUser();
+                        showMenu();
+                        break;
+                    case 4:
+                        UserDBActions.deleteUser();
+                        showMenu();
+                        break;
+                    case 5:
+                        System.out.println("View all sent messages");
+                        break;
+                    case 6:
+                        System.out.println("Delete an inbox message");
+                        break;
+                    case 7:
+                        System.out.println("Delete a  sent message");
+                        break;
+                    case 8:
+                        System.out.println("View messages from all users");
+                        break;
+                    case 9:
+                        System.out.println(" Edit a user's message");
+                        break;
+                    case 10:
+                        System.out.println("Delete a user message");
+                        break;
+                    case 11:
+                        System.out.println();
+                        LoginScreen.login();
+                        break;
+                    case 12:
+                        System.out.println();
+                        LoginScreen.login();
+                        break;
+                    default:
+                        System.out.println("Please use the options above...");
+                        break;
+                }//switch, exit
+            } //while loop, exit
+        }//if (choose role), exit
 
-                    switch (choice) {
-                        case 1:
-                            System.out.println("These are of the people using the application\n");
-                            DatabaseActions.printAllUsers();
-                            break;
-                        case 2:
-                            UserDBActions.createUserInDB();
-                            System.out.println();
-                            showMenu();
-                            break;
-                        case 3: 
-                            UserDBActions.editUser();
-                            showMenu();
-                            break;
-                        case 4:
-                            UserDBActions.deleteUser();
-                            showMenu();
-                            break;
-                        case 5:
-                            System.out.println("View all sent messages");
-                            break;
-                        case 6:
-                            System.out.println("Delete an inbox message");
-                            break;
-                        case 7:
-                            System.out.println("Delete a  sent message");
-                            break;
-                        case 8:
-                            System.out.println("View messages from all users");
-                            break;
-                        case 9:
-                            System.out.println(" Edit a user's message");
-                            break;
-                        case 10:
-                            System.out.println("Delete a user message");
-                            break;
-                        case 11:
-                            System.out.println();
-                            LoginScreen.login();
-                            break;
-                            case 12:
-                            System.out.println();
-                            LoginScreen.login();
-                            break;
-                        default:
-                            System.out.println("Please use the options above...");
-                            break;
-                    }
-                } else {
-                    isNumber = false;
-                    if (isNumber == false) {
-                        sc.next();
-                    }
-                    System.out.println("ATTENTION! Not a valid input, please enter a number\n");
-
-                }
-            } //while loop exit
-        }//first if exit
         else if (user.getRoleId() == 2) {
             System.out.println("\n---USER MENU---");
             System.out.println("What do you want to do?");
@@ -118,40 +106,31 @@ public class Menu {
             System.out.println("------------------------");
 
             while (true) {
-                System.out.print("Enter your choice>>: ");
-                if (sc.hasNextInt()) {
-                    choice = sc.nextInt();
-                    isNumber = true;
-
-                    switch (choice) {
-                        case 1:
-                            System.out.println("all inbox messages");
-                            break;
-                        case 2:
-                            System.out.println("all sent messages");
-                            break;
-                        case 3:
-                            System.out.println("delete an inbox messages");
-                            break;
-                        case 4:
-                            System.out.println("delete an sent messages");
-                            break;
-                        case 5:
-                            System.out.println();
-                            LoginScreen.login();
-                            break;
-                        default:
-                            System.out.println("Please use the options above...\n");
-                    }
-                } else {
-                    isNumber = false;
-                    if (isNumber == false) {
-                        sc.next();
-                    }
-                    System.out.println("ATTENTION! Not a valid input, please enter a number\n");
+                System.out.print("\nEnter your choice >> ");
+                int choice = Validation.validateIntInput(sc);
+                switch (choice) {
+                    case 1:
+                        System.out.println("all inbox messages");
+                        break;
+                    case 2:
+                        System.out.println("all sent messages");
+                        break;
+                    case 3:
+                        System.out.println("delete an inbox messages");
+                        break;
+                    case 4:
+                        System.out.println("delete an sent messages");
+                        break;
+                    case 5:
+                        System.out.println();
+                        LoginScreen.login();
+                        break;
+                    default:
+                        System.out.println("Please use the options above...\n");
                 }
-            }
-        }//else if exit
+
+            } //while exit
+        } //second if to choose role exit
         else if (user.getRoleId() == 3) {
             System.out.println("--- State Authority  MENU ---");
             System.out.println("[1] View all users");
@@ -166,46 +145,37 @@ public class Menu {
 
             while (true) {
                 System.out.print("\nEnter your choice >> ");
-                if (sc.hasNextInt()) {
-                    choice = sc.nextInt();
-//                    isNumber = true;
+                int choice = Validation.validateIntInput(sc);
 
-                    switch (choice) {
-                        case 1:
-                            System.out.println("all inbox messages");
-                            break;
-                        case 2:
-                            System.out.println("all sent messages");
-                            break;
-                        case 3:
-                            System.out.println("delete an inbox messages");
-                            break;
-                        case 4:
-                            System.out.println("delete an sent messages");
-                            break;
-                        case 5:
-                            System.out.println("all inbox messages");
-                            break;
-                        case 6:
-                            System.out.println("all sent messages");
-                            break;
-                        case 7:
-                            System.out.println();
-                            LoginScreen.login();
-                            break;
-                        default:
-                            System.out.println("Please use the options above...\n");
-                    }
-                } else {
-                    isNumber = false;
-                    if (isNumber == false) {
-                        sc.next();
-                    }
-                    System.out.println("ATTENTION! Not a valid input, please enter a number\n");
+                switch (choice) {
+                    case 1:
+                        System.out.println("all inbox messages");
+                        break;
+                    case 2:
+                        System.out.println("all sent messages");
+                        break;
+                    case 3:
+                        System.out.println("delete an inbox messages");
+                        break;
+                    case 4:
+                        System.out.println("delete an sent messages");
+                        break;
+                    case 5:
+                        System.out.println("all inbox messages");
+                        break;
+                    case 6:
+                        System.out.println("all sent messages");
+                        break;
+                    case 7:
+                        System.out.println();
+                        LoginScreen.login();
+                        break;
+                    default:
+                        System.out.println("Please use the options above...\n");
                 }
-            } //while loop exit
-        }//first if exit
 
-    }//method exit
-}//class exit
+            } //while loop exit
+        }// third if to choose user role exit
+    }//menu method exit;
+}  //class exit
 
