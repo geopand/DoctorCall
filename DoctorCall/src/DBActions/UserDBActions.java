@@ -1,16 +1,14 @@
 package DBActions;
 
-import com.sun.org.apache.xpath.internal.axes.HasPositionalPredChecker;
 import entities.User;
 import home.Menu;
-import java.nio.file.attribute.AclEntryType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import util.DoctorCallException;
-import util.Validation;
+import util.InputHelper;
 
 public class UserDBActions {
 
@@ -36,7 +34,7 @@ public class UserDBActions {
         System.out.println("\t[1] Administrator\n\t[2] User(Patient/Doctor)\n\t[3] State Authority");
         System.out.println("----------------------------------------------------");
         System.out.print("Please enter role id: ");
-        long roleId = Validation.validateLongInput(sc);
+        long roleId = InputHelper.validateLongInput(sc);
         boolean validId = DatabaseActions.roleIdExists(roleId);
         if (validId) {
 
@@ -57,9 +55,11 @@ public class UserDBActions {
             createUserInDB();
         }
     }
+    
+ 
 
     public static void deleteUser() {
-
+        int count=0;
         Scanner sc = new Scanner(System.in);
         System.out.println("This is the list of users.");
         DatabaseActions.printAllUsers();
@@ -73,9 +73,9 @@ public class UserDBActions {
         }
 
         System.out.println("You have selected the user with id= " + userid);
-        System.out.println("Are you sure you want to delete the user? Press y/n");
+        System.out.println("Are you sure you want to delete the user? Press y/n :");
         String answer = sc.next().toLowerCase();
-
+//          String answer = InputHelper.validateStringInput(sc, "Press y/n :");
         if ("y".equals(answer)) {
             String sqlDeleteUser = "UPDATE  user SET deleted=1 WHERE uid=?";
             try (Connection conn = DatabaseActions.openConnection();
@@ -95,11 +95,10 @@ public class UserDBActions {
             }
         } else {
             System.out.println(" Exiting the programm...");
-        };
-
+            }
     }
 
-    public static void editUser() {
+    public static void editUser() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("This is the list of users.");
@@ -107,18 +106,23 @@ public class UserDBActions {
         System.out.println("\n");
         System.out.println("Which user do you want to edit?");
         System.out.print("Enter user id here: ");
-        int userId = Validation.validateIntInput(sc);
+        int userId = InputHelper.validateIntInput(sc);
         DatabaseActions.showUserById(userId);
 
         System.out.println("Please enter a new username: ");
         String newUsername = sc.next().toLowerCase().trim();
+        while (DatabaseActions.usernameExists(newUsername) == true) {
+            System.out.println("This username is already taken!\n");
+            editUser();
+        }
+
         System.out.println("Please enter a new password: ");
         String newPassword = sc.next().toLowerCase().trim();
         System.out.println("Available roles to choose ");
         System.out.println("\t[1] Administrator\n\t[2] User(Patient/Doctor)\n\t[3] State Authority");
         System.out.println("----------------------------------------------------");
         System.out.print("Please enter role id: ");
-        int roleId = Validation.validateIntInput(sc);
+        int roleId = InputHelper.validateIntInput(sc);
 
         String sqlEditUser = "UPDATE user SET username=?, password=?, role_id=? where user.uid=?;";
         try (Connection conn = DatabaseActions.openConnection();
@@ -134,7 +138,7 @@ public class UserDBActions {
                 System.out.println("These are the new details");
                 DatabaseActions.showUserById(userId);
             } else {
-                System.out.println("User " + newUsername + " was not updated");
+                System.out.println("ATTENTION!! User " + newUsername + " was not updated.\n Check the user id you entered for mistakes.");
             };
 
         } catch (SQLException ex) {
