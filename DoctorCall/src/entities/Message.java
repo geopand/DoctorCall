@@ -11,7 +11,7 @@ public class Message {
     private User sender;
     private User recipient;
     private String messageBody;
-    private Date creationDate; //here we take the date from the mysqlDB using sql.Date
+    private Timestamp creationDate; //here we take the date from the mysqlDB using sql.Date
 
     public Message() {
     }
@@ -49,11 +49,11 @@ public class Message {
         this.messageBody = messageBody;
     }
 
-    public Date getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -79,6 +79,11 @@ public class Message {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" + "messageId=" + messageId + ", sender=" + sender + ", recipient=" + recipient + ", messageBody=" + messageBody + ", creationDate=" + creationDate + '}';
     }
 
   

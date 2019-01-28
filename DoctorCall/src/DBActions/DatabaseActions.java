@@ -41,6 +41,29 @@ public class DatabaseActions {
             throw new DoctorCallException(e.getMessage(), e);
         }
     }
+    
+    public static User fetchUserOrNullById(Long uid) throws DoctorCallException, SQLException {
+        String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE uid=?;";
+
+        try (Connection conn = openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlFetchUser);) {
+            ps.setLong(1, uid);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getLong(1));
+                user.setUsername(rs.getString(2));
+                user.setPassword(rs.getString(3));
+                user.setRoleId(rs.getLong(4));
+                return user;
+            } else {
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new DoctorCallException(e.getMessage(), e);
+        }
+    }
 
     public static boolean usernameExists(String username) throws DoctorCallException, SQLException {
         String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE username=?;";

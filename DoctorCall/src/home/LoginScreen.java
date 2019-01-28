@@ -29,6 +29,7 @@ public class LoginScreen {
             count++;
         }
 
+//Here the user enter his credentials
         System.out.println("Please provide your credentials or press [q] to quit the application");
         System.out.print("\t  Enter your username:  ");
         String username = sc.next().toLowerCase().trim();
@@ -45,7 +46,7 @@ public class LoginScreen {
         }
 
         
-//Authenticating User and showing the right menu
+//Authenticating User and showing the right menu if user exists
         UserDBActions userDBActions = new UserDBActions();
         User user = userDBActions.getUser(username, password);
         if (user != null) {

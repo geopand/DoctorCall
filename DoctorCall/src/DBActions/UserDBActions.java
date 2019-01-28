@@ -12,12 +12,19 @@ import util.InputHelper;
 
 public class UserDBActions {
 
+    
+//this method gets a User Object if exists
     public User getUser(String username, String password) throws DoctorCallException, SQLException {
-
         User user = DatabaseActions.fetchUserOrNull(username, password);
         return user;
     }
+    
+    public User fetchUserById (Long uid) throws DoctorCallException, SQLException{
+        User user = DatabaseActions.fetchUserOrNullById(uid);
+        return user;
+    }
 
+//this method creates a new User in the database    
     public static void createUserInDB() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
         System.out.print("Please enter username: ");
@@ -57,7 +64,7 @@ public class UserDBActions {
     }
     
  
-
+//this method deletes a user from the database (soft delete, meaning a flag deleted is turned to true in the DB)
     public static void deleteUser() {
         int count=0;
         Scanner sc = new Scanner(System.in);
@@ -98,6 +105,7 @@ public class UserDBActions {
             }
     }
 
+//this method enables the admin to edit the details of a user in the DB
     public static void editUser() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
 
@@ -111,7 +119,6 @@ public class UserDBActions {
 
         System.out.println("Please enter a new username: ");
         String newUsername = sc.next().toLowerCase().trim();
-
 
         System.out.println("Please enter a new password: ");
         String newPassword = sc.next().toLowerCase().trim();
@@ -136,8 +143,7 @@ public class UserDBActions {
                 DatabaseActions.showUserById(userId);
             } else {
                 System.out.println("ATTENTION!! User " + newUsername + " was not updated.\n Check the user id you entered for mistakes.");
-            };
-
+            }
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }

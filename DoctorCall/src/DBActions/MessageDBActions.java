@@ -1,6 +1,7 @@
 package DBActions;
 
 import static DBActions.DatabaseActions.openConnection;
+import entities.Message;
 import entities.User;
 import home.Menu;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.Scanner;
 import util.DoctorCallException;
 import util.InputHelper;
+import util.LogMessageToFile;
 
 public class MessageDBActions {
 
@@ -75,6 +77,8 @@ public class MessageDBActions {
     }
 
     public static void inboxMessageActionMenuUser(User user) {
+        User user1 = user;
+        int choice = (int) (long) user1.getRoleId();
         Scanner sc = new Scanner(System.in);
         System.out.println("\nYou can do the following");
         System.out.println("\t[1]  Delete a message");
@@ -87,18 +91,43 @@ public class MessageDBActions {
                 int mid = InputHelper.validateIntInput(sc);
                 deleteInboxMessageByUser(mid, user);
                 System.out.println("\n\n");
-                Menu.userTextMenu();
+                switch (choice) {
+                    case 1:
+                        Menu.adminTextMenu();
+                        break;
+                    case 2:
+                        Menu.userTextMenu();
+                        break;
+                    case 3:
+                        Menu.stateAuthorityMenu();
+                        break;
+                    default:
+                }
                 break;
             case 2:
                 System.out.println("");
-                Menu.userTextMenu();
+                switch (choice) {
+                    case 1:
+                        Menu.adminTextMenu();
+                        break;
+                    case 2:
+                        Menu.userTextMenu();
+                        break;
+                    case 3:
+                        Menu.stateAuthorityMenu();
+                        break;
+                    default:
+                }
                 break;
             default:
                 System.out.println("Choose a valid option");
         }
     }
-    
+
     public static void sentMessageActionMenuUser(User user) {
+        User user1 = user;
+        int choice = (int) (long) user1.getRoleId();
+
         Scanner sc = new Scanner(System.in);
         System.out.println("\nYou can do the following");
         System.out.println("\t[1]  Delete a message");
@@ -111,11 +140,33 @@ public class MessageDBActions {
                 int mid = InputHelper.validateIntInput(sc);
                 deleteSentMessageByUser(mid, user);
                 System.out.println("\n\n");
-                Menu.userTextMenu();
+                switch (choice) {
+                    case 1:
+                        Menu.adminTextMenu();
+                        break;
+                    case 2:
+                        Menu.userTextMenu();
+                        break;
+                    case 3:
+                        Menu.stateAuthorityMenu();
+                        break;
+                    default:
+                }
                 break;
             case 2:
                 System.out.println("");
-                Menu.userTextMenu();
+                switch (choice) {
+                    case 1:
+                        Menu.adminTextMenu();
+                        break;
+                    case 2:
+                        Menu.userTextMenu();
+                        break;
+                    case 3:
+                        Menu.stateAuthorityMenu();
+                        break;
+                    default:
+                }
                 break;
             default:
                 System.out.println("Choose a valid option");
@@ -156,7 +207,7 @@ public class MessageDBActions {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
-    
+
     public static void deleteSentMessageByUser(int mid, User user) {
         User senderUser = user;
         String sqlDeleteInboxMsg = "UPDATE message SET deleted_by_sender=1 where message.mid=? and sender_id=?;";
@@ -175,14 +226,13 @@ public class MessageDBActions {
         }
     }
 
-    public static void sendMessage(User user) {
+    public  void sendMessage(User user) throws DoctorCallException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please choose a user to send a message");
         DatabaseActions.printAllUsers();
         System.out.print("\nEnter the user's id you want to send message>> ");
         int recipientID = InputHelper.validateIntInput(sc);
         User senderUser = user;
-        Long senderId = senderUser.getUserId();
         System.out.print("Write your message >>");
         sc.nextLine();
         String message = sc.nextLine();
@@ -190,14 +240,32 @@ public class MessageDBActions {
         String sqlInsertMessage = "INSERT INTO message (sender_id, recipient_id, message) VALUES (?,?,?);";
         try (Connection conn = DatabaseActions.openConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlInsertMessage);) {
-            ps.setLong(1, senderId);
+            ps.setLong(1, senderUser.getUserId());
             ps.setInt(2, recipientID);
             ps.setString(3, message);
             int cnt = ps.executeUpdate();
             if (cnt == 1) {
                 System.out.println("Message  successfully sent!");
+                Message msg =lastEnteredMessage();
+                Long mid = msg.getMessageId();
+                String sender = msg.getSender().getUsername();
+                String recipient  = msg.getRecipient().getUsername();
+                String messageBody = msg.getMessageBody();
+                Timestamp creationDate = msg.getCreationDate();
+                
+                System.out.println(msg);
+                System.out.println(msg.getMessageId()+ ", "
+                    + msg.getSender().getUsername()
+                    + " , " + msg.getRecipient().getUsername()
+                    + " , " + msg.getMessageBody() + " , "
+                    + msg.getCreationDate()
+            );
+                LogMessageToFile lmtf = new LogMessageToFile();
+//                lmtf.writeToTextFile(msg);
+                    lmtf.writeToTextFile(mid,sender,recipient, messageBody,creationDate);
+
             } else {
-                System.out.println("ATTENTION!! MEssage was not sent!");
+                System.out.println("ATTENTION!! Message was not sent!");
             }
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
@@ -257,6 +325,7 @@ public class MessageDBActions {
                 Timestamp creationDate = rs.getTimestamp(4);
                 count++;
                 if (count == 1) {
+                    System.out.println("\n---[ SENT FOLDER ]---");
                     System.out.println("Message ID" + " | " + " To     " + "\t | " + "Message\t  " + " | " + "Created");
                     System.out.println("---------------------------------------------------------------");
                 } else {
@@ -321,5 +390,31 @@ public class MessageDBActions {
         }
 
     }
-
+    
+    
+    
+    
+//    lmtf.writeToTextFile(msg);
+    
+    public Message lastEnteredMessage() throws DoctorCallException {
+        UserDBActions uDBA = new UserDBActions();
+        String sqlFetchMessage = "select mid,sender_id,recipient_id,message,creation_date FROM message where deleted_by_sender=0 and deleted_by_recipient=0  ORDER BY creation_date DESC limit 1;";
+        try (Connection conn = DatabaseActions.openConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlFetchMessage);) {
+           ResultSet rs = ps.executeQuery();
+           if (rs.next()) {
+               Message msg  = new Message();
+               msg.setMessageId(rs.getLong(1));
+               msg.setSender(uDBA.fetchUserById(rs.getLong(2)));
+               msg.setRecipient(uDBA.fetchUserById(rs.getLong(3)));
+               msg.setMessageBody(rs.getString(4));
+               msg.setCreationDate(rs.getTimestamp(5));
+               return msg;
+           }else {
+                return null;
+            }
+        }catch (SQLException e) {
+            throw new DoctorCallException(e.getMessage(), e);
+        }
+    }
 }

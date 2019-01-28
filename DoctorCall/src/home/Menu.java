@@ -20,13 +20,17 @@ public class Menu {
 
     public void showMenu() throws DoctorCallException, SQLException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nWelcome dear " + user.getUsername()+"!");
+        System.out.println("\nWelcome dear " + user.getUsername() + "!");
 
+//Depending on the user role the app shows a different Menu: 1=admin, 2=plain user, 3=stateauthority
         if (user.getRoleId() == 1) {
+
+//Each text menu is added as a void method at the end of the class for better UX experience
             adminTextMenu();
 
             while (true) {
                 System.out.print("\nEnter your choice >> ");
+                //this validates the user input accepting only integer type
                 int choice = InputHelper.validateIntInput(sc);
                 switch (choice) {
                     case 1:
@@ -47,22 +51,23 @@ public class Menu {
                         showMenu();
                         break;
                     case 5:
-                        System.out.println("View all sent messages");
+                        MessageDBActions ma = new MessageDBActions();
+                        ma.sendMessage(user);
+                        showMenu();
                         break;
                     case 6:
-                        System.out.println("Delete an inbox message");
+                        MessageDBActions.readUserInbox(user);
+                        MessageDBActions.inboxMessageActionMenuUser(user);
                         break;
                     case 7:
-                        System.out.println("Delete a  sent message");
+                        MessageDBActions.readUserSentFolder(user);
+                        MessageDBActions.sentMessageActionMenuUser(user);
                         break;
-                    case 8:
-                        System.out.println("View messages from all users");
-                        break;
-                    case 9:
+                    case 8:                        
                         MessageDBActions.printAllMessages();
                         MessageDBActions.messageActionMenuAdmin();
                         break;
-                    case 10:
+                    case 9:
                         System.out.println();
                         LoginScreen.login();
                         break;
@@ -80,11 +85,13 @@ public class Menu {
                 int choice = InputHelper.validateIntInput(sc);
                 switch (choice) {
                     case 1:
-                        MessageDBActions.sendMessage(user);
+                        MessageDBActions ma = new MessageDBActions();
+                        ma.sendMessage(user);
                         showMenu();
                         break;
-                    case 2: MessageDBActions.readUserInbox(user);
-                    MessageDBActions.inboxMessageActionMenuUser(user);
+                    case 2:
+                        MessageDBActions.readUserInbox(user);
+                        MessageDBActions.inboxMessageActionMenuUser(user);
 //                    userTextMenu();
                         break;
                     case 3:
@@ -102,16 +109,7 @@ public class Menu {
             } //while exit
         } //second if to choose role exit
         else if (user.getRoleId() == 3) {
-            System.out.println("--- State Authority  MENU ---");
-            System.out.println("What do you want to do?");
-            System.out.println("[1]. Send a message");
-            System.out.println("[1]. Inbox folder");
-            System.out.println("[3]. Sent folder");
-            System.out.println("[4]. Log out");
-            System.out.println("______________________________");
-            System.out.println("[5] View all users in the system");
-            System.out.println("[6] View messages from all users");
-            System.out.println("[7] Log out");
+            stateAuthorityMenu();
 
             while (true) {
                 System.out.print("\nEnter your choice >> ");
@@ -119,24 +117,27 @@ public class Menu {
 
                 switch (choice) {
                     case 1:
-                        System.out.println("all inbox messages");
+                        MessageDBActions ma = new MessageDBActions();
+                        ma.sendMessage(user);
+                        showMenu();
                         break;
                     case 2:
-                        System.out.println("all sent messages");
+                        MessageDBActions.readUserInbox(user);
+                        MessageDBActions.inboxMessageActionMenuUser(user);
                         break;
                     case 3:
-                        System.out.println("delete an inbox messages");
+                        MessageDBActions.readUserSentFolder(user);
+                        MessageDBActions.sentMessageActionMenuUser(user);
                         break;
                     case 4:
-                        System.out.println("delete an sent messages");
+                        System.out.println("These are the people using the application\n");
+                        DatabaseActions.printAllUsers();
                         break;
                     case 5:
-                        System.out.println("all inbox messages");
+                        System.out.println("These are all the messages in the db");
+                        MessageDBActions.printAllMessages();
                         break;
                     case 6:
-                        System.out.println("all sent messages");
-                        break;
-                    case 7:
                         System.out.println();
                         LoginScreen.login();
                         break;
@@ -156,27 +157,35 @@ public class Menu {
         System.out.println("[4] Delete a user");
         System.out.println("______________________________");
         System.out.println("---Admin's Messages---");
-        System.out.println("[5] View all inbox messages");
-        System.out.println("[6] View all sent messages");
-        System.out.println("[7] Delete an inbox message");
-        System.out.println("[8] Delete a  sent message");
+        System.out.println("[5] Send a message");
+        System.out.println("[6] Inbox folder");
+        System.out.println("[7] Sent folder");
+        
         System.out.println("______________________________");
         System.out.println("---User's Messages---");
-        System.out.println("[9]  View/Edit/Delete messages from all users");
-        System.out.println("[10] Log out");
+        System.out.println("[8]  View/Edit/Delete messages from all users");
+        System.out.println("[9] Log out");
     }
-    
+
     public static void userTextMenu() {
-          System.out.println("\n---USER MENU---");
-            System.out.println("What do you want to do?");
-            System.out.println("[1]. Send a message");
-            System.out.println("[2]. Inbox folder");
-            System.out.println("[3]. Sent folder");
-            System.out.println("[4]. Log out");
-            System.out.println("____________________________");
+        System.out.println("\n---USER MENU---");
+        System.out.println("What do you want to do?");
+        System.out.println("[1] Send a message");
+        System.out.println("[2] Inbox folder");
+        System.out.println("[3] Sent folder");
+        System.out.println("[4] Log out");
     }
-    
-    
-    
+
+    public static void stateAuthorityMenu() {
+        System.out.println("--- STATE AUTHORITY MENU ---");
+        System.out.println("[1] Send a message");
+        System.out.println("[2] Inbox folder");
+        System.out.println("[3] Sent folder");
+        System.out.println("______________________________");
+        System.out.println("[4] View all users in the system");
+        System.out.println("[5] View messages from all users");
+        System.out.println("[6] Log out");
+    }
+
 }  //class exit
 

@@ -1,7 +1,7 @@
 package entities;
 
-
 public class User {
+
     private long userId;
     private String username;
     private String password;
@@ -17,8 +17,6 @@ public class User {
         this.roleId = roleId;
     }
 
-    
-    
     public long getUserId() {
         return userId;
     }
@@ -75,19 +73,9 @@ public class User {
         return true;
     }
 
-    
-
-    
-    
-    
-    
     @Override
     public String toString() {
         return "User{" + "userId=" + userId + ", username=" + username + ", password=" + password + ", roleId=" + roleId + '}';
     }
-    
 
-    
-    
-    
 }
