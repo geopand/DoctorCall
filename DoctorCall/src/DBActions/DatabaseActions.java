@@ -41,7 +41,7 @@ public class DatabaseActions {
             throw new DoctorCallException(e.getMessage(), e);
         }
     }
-    
+
     public static User fetchUserOrNullById(Long uid) throws DoctorCallException, SQLException {
         String sqlFetchUser = "SELECT uid, username, password, role_id FROM user WHERE uid=?;";
 
@@ -113,7 +113,7 @@ public class DatabaseActions {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
-    
+
     public static void printAllUsers() {
         String sqlSelect = "SELECT uid, username, role.role FROM user, role WHERE user.role_id = role.rid  AND deleted=0 order by uid;";
 
@@ -127,11 +127,11 @@ public class DatabaseActions {
                 String role = rs.getString(3);
                 count++;
                 if (count == 1) {
-                    System.out.println("User ID" + " | " + " Username " + "\t | " +  " Role ");
+                    System.out.println("User ID" + " | " + " Username " + "\t | " + " Role ");
                     System.out.println("---------------------------------------------------------------");
                 } else {
                 }
-                System.out.println(id + "\t | " + username + "\t | "  + role);
+                System.out.println(id + "\t | " + username + "\t | " + role);
             }
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
@@ -189,34 +189,6 @@ public class DatabaseActions {
         return DriverManager.getConnection(urldb, user, pass);
     }
 
-    public static void superPrintAllMessages() {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(urldb, user, pass);
-            String sqlSelectAllMsgs = "SELECT  ";
-            PreparedStatement ps1 = conn.prepareStatement(sqlSelectAllMsgs);
-            ResultSet rs1 = ps1.executeQuery();
-            int count = 0;
-            while (rs1.next()) {
-                Long id = rs1.getLong(1);
-                String username = rs1.getString(2);
-                String password = rs1.getString(3);
-                String role = rs1.getString(4);
-                count++;
-                if (count == 1) {
-                    System.out.println("User ID " + " | " + " Username " + "\t | " + " Password " + "\t | " + " Role ");
-                    System.out.println("---------------------------------------------------------------");
-                } else {
-                }
-                System.out.println(id + "\t | " + username + "\t | " + password + "\t | " + role);
-            }
-            ps1.close();
-            conn.close();;
-        } catch (SQLException ex) {
-            System.out.println("Problem connecting to the database: " + ex);
-        }
-    }
-
     public static ArrayList<Long> getAllRoleIds() {
         ArrayList<Long> al = new ArrayList<Long>();
         String sqlSelect = "SELECT rid FROM role";
@@ -234,5 +206,4 @@ public class DatabaseActions {
         }
         return null;
     }
-
 }

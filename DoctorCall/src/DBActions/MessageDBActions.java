@@ -4,6 +4,10 @@ import static DBActions.DatabaseActions.openConnection;
 import entities.Message;
 import entities.User;
 import home.Menu;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +16,6 @@ import java.sql.Timestamp;
 import java.util.Scanner;
 import util.DoctorCallException;
 import util.InputHelper;
-import util.LogMessageToFile;
 
 public class MessageDBActions {
 
@@ -37,7 +40,6 @@ public class MessageDBActions {
                 }
                 System.out.println(mid + "\t | " + senderUsername + "\t | " + recipientUsername + "  \t | " + message + "  \t | " + creationDate);
             }
-
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
@@ -70,7 +72,6 @@ public class MessageDBActions {
                 System.out.println("\n\n");
                 Menu.adminTextMenu();
                 break;
-
             default:
                 System.out.println("Choose a valid option");
         }
@@ -181,7 +182,6 @@ public class MessageDBActions {
             int cnt = ps1.executeUpdate();
             if (cnt == 1) {
                 System.out.println("Message with id:  " + mid + " successfully deleted");
-
             } else {
                 System.out.println("ATTENTION!! MEssage with id:  " + mid + " was not deleted.\n Check the message id you entered for mistakes.");
             }
@@ -189,7 +189,8 @@ public class MessageDBActions {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
-
+    
+//this method provide a soft delete of a message so that the user does not see it in his/ger inbox
     public static void deleteInboxMessageByUser(int mid, User user) {
         User recipientUser = user;
         String sqlDeleteInboxMsg = "UPDATE message SET deleted_by_recipient=1 where message.mid=? and recipient_id=?;";
@@ -207,7 +208,8 @@ public class MessageDBActions {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
-
+    
+//this method provide a soft delete of a message so that the user does not see it in his/ger sent folder
     public static void deleteSentMessageByUser(int mid, User user) {
         User senderUser = user;
         String sqlDeleteInboxMsg = "UPDATE message SET deleted_by_sender=1 where message.mid=? and sender_id=?;";
@@ -226,7 +228,7 @@ public class MessageDBActions {
         }
     }
 
-    public  void sendMessage(User user) throws DoctorCallException {
+    public void sendMessage(User user) throws DoctorCallException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please choose a user to send a message");
         DatabaseActions.printAllUsers();
@@ -246,33 +248,31 @@ public class MessageDBActions {
             int cnt = ps.executeUpdate();
             if (cnt == 1) {
                 System.out.println("Message  successfully sent!");
-                Message msg =lastEnteredMessage();
-                Long mid = msg.getMessageId();
-                String sender = msg.getSender().getUsername();
-                String recipient  = msg.getRecipient().getUsername();
-                String messageBody = msg.getMessageBody();
-                Timestamp creationDate = msg.getCreationDate();
-                
-                System.out.println(msg);
-                System.out.println(msg.getMessageId()+ ", "
-                    + msg.getSender().getUsername()
-                    + " , " + msg.getRecipient().getUsername()
-                    + " , " + msg.getMessageBody() + " , "
-                    + msg.getCreationDate()
-            );
-                LogMessageToFile lmtf = new LogMessageToFile();
-//                lmtf.writeToTextFile(msg);
-                    lmtf.writeToTextFile(mid,sender,recipient, messageBody,creationDate);
+                Message msg = lastEnteredMessage();
 
+//the code bellow print all sent messages to a text file inside the Netbeans Folder.
+                PrintWriter outputStream = null;
+                try {
+                    outputStream = new PrintWriter(new FileOutputStream("doctorcall.log.txt", true));
+
+                } catch (FileNotFoundException e) {
+                    System.out.println(e);
+                }
+                outputStream.println(+msg.getMessageId() + ", "
+                        + msg.getSender().getUsername()
+                        + " , " + msg.getRecipient().getUsername()
+                        + " , " + msg.getMessageBody() + " , "
+                        + msg.getCreationDate());
+                outputStream.close();
             } else {
                 System.out.println("ATTENTION!! Message was not sent!");
             }
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
-
     }
 
+//this code fetches and prints to the screen all inbox messages when given the Object user
     public static void readUserInbox(User user) {
         User recipientUser = user;
         long recipientUid = recipientUser.getUserId();
@@ -307,6 +307,7 @@ public class MessageDBActions {
         }
     }
 
+//this code fetches and prints to the screen all sent messages when given the Object user
     public static void readUserSentFolder(User user) {
         User senderUser = user;
         long senderUid = senderUser.getUserId();
@@ -341,6 +342,7 @@ public class MessageDBActions {
         }
     }
 
+//this code allows user to edit the message body
     public static void editMessage(int mid) {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nYou have selected the following message");
@@ -363,6 +365,7 @@ public class MessageDBActions {
             System.out.println("Problem connecting to the database: " + ex);
         }
     }
+//this is used in the editMessage method to allow the user to see which message they are editing
 
     public static void showMessageById(int mid) {
         String sqlFetchMessage = "SELECT mid,  user.username, user1.username, message, creation_date FROM message, user, user as user1 WHERE message.sender_id=user.uid AND  message.recipient_id=user1.uid and message.mid=?";
@@ -388,32 +391,27 @@ public class MessageDBActions {
         } catch (SQLException ex) {
             System.out.println("Problem connecting to the database: " + ex);
         }
-
     }
-    
-    
-    
-    
+
 //    lmtf.writeToTextFile(msg);
-    
     public Message lastEnteredMessage() throws DoctorCallException {
         UserDBActions uDBA = new UserDBActions();
         String sqlFetchMessage = "select mid,sender_id,recipient_id,message,creation_date FROM message where deleted_by_sender=0 and deleted_by_recipient=0  ORDER BY creation_date DESC limit 1;";
         try (Connection conn = DatabaseActions.openConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlFetchMessage);) {
-           ResultSet rs = ps.executeQuery();
-           if (rs.next()) {
-               Message msg  = new Message();
-               msg.setMessageId(rs.getLong(1));
-               msg.setSender(uDBA.fetchUserById(rs.getLong(2)));
-               msg.setRecipient(uDBA.fetchUserById(rs.getLong(3)));
-               msg.setMessageBody(rs.getString(4));
-               msg.setCreationDate(rs.getTimestamp(5));
-               return msg;
-           }else {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Message msg = new Message();
+                msg.setMessageId(rs.getLong(1));
+                msg.setSender(uDBA.fetchUserById(rs.getLong(2)));
+                msg.setRecipient(uDBA.fetchUserById(rs.getLong(3)));
+                msg.setMessageBody(rs.getString(4));
+                msg.setCreationDate(rs.getTimestamp(5));
+                return msg;
+            } else {
                 return null;
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DoctorCallException(e.getMessage(), e);
         }
     }
